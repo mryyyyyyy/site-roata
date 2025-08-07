@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roată personalizabilă</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f0f0f0;
+    }
+    .wheel {
+      margin: 0 auto 20px;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      border: 10px solid #333;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    .segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      background: #ccc;
+      transform-origin: 100% 100%;
+    }
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-bottom: 50px solid red;
+      margin: 0 auto;
+      position: relative;
+      top: -10px;
+    }
+    #spinButton, #setOptions {
+      padding: 10px 30px;
+      font-size: 18px;
+      margin: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .input-field {
+      margin: 5px;
+      display: block;
+    }
+    .input-field input {
+      width: 400px;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Roată personalizabilă</h2>
+  <div id="inputs">
+    <p>Introduceți 4 opțiuni:</p>
+    <div class="input-field"><input type="text" id="opt1" placeholder="Varianta 1"></div>
+    <div class="input-field"><input type="text" id="opt2" placeholder="Varianta 2"></div>
+    <div class="input-field"><input type="text" id="opt3" placeholder="Varianta 3"></div>
+    <div class="input-field"><input type="text" id="opt4" placeholder="Varianta 4"></div>
+    <button id="setOptions">Setează roata</button>
+  </div>
+
+  <div id="pointer"></div>
+  <div class="wheel" id="wheel"></div>
+  <button id="spinButton">Învârte roata</button>
+  <div id="result"></div>
+
+  <script>
+    let options = [];
+    let wheel = document.getElementById("wheel");
+    let result = document.getElementById("result");
+
+    function drawWheel() {
+      wheel.innerHTML = "";
+      const deg = 360 / options.length;
+
+      options.forEach((opt, i) => {
+        const seg = document.createElement("div");
+        seg.className = "segment";
+        seg.style.transform = `rotate(${deg * i}deg) skewY(-${90 - deg}deg)`;
+        seg.style.background = i % 2 === 0 ? "#90ee90" : "#add8e6";
+
+        const label = document.createElement("div");
+        label.textContent = opt;
+        label.style.transform = `skewY(${90 - deg}deg) rotate(${deg / 2}deg)`;
+        label.style.transformOrigin = "left top";
+        label.style.position = "absolute";
+        label.style.top = "120px";
+        label.style.left = "30px";
+        label.style.fontSize = "18px";
+        label.style.width = "250px";
+        label.style.wordWrap = "break-word";
+
+        seg.appendChild(label);
+        wheel.appendChild(seg);
+      });
+    }
+
+    document.getElementById("setOptions").onclick = () => {
+      const input1 = document.getElementById("opt1").value.trim();
+      const input2 = document.getElementById("opt2").value.trim();
+      const input3 = document.getElementById("opt3").value.trim();
+      const input4 = document.getElementById("opt4").value.trim();
+
+      options = [input1, input2, input3, input4].filter(opt => opt);
+      if (options.length < 2) return alert("Ai nevoie de cel puțin 2 opțiuni.");
+
+      drawWheel();
+      result.textContent = "";
+    };
+
+    document.getElementById("spinButton").onclick = () => {
+      if (options.length < 2) return alert("Setează mai întâi opțiunile pentru roată.");
+
+      const preferate = options.filter(opt => opt === "Mary - camera alba" || opt === "Teo - camera neagra");
+      if (preferate.length === 0) return alert("Trebuie să existe cel puțin una dintre variantele permise: Mary - camera alba sau Teo - camera neagra.");
+
+      const winner = preferate[Math.floor(Math.random() * preferate.length)];
+      const index = options.indexOf(winner);
+      const segmentAngle = 360 / options.length;
+      const randomOffset = Math.random() * segmentAngle;
+      const rotateTo = 360 * 5 + (360 - index * segmentAngle - randomOffset);
+
+      wheel.style.transition = "transform 5s ease-out";
+      wheel.style.transform = `rotate(${rotateTo}deg)`;
+
+      setTimeout(() => {
+        result.textContent = `Câștigătorul este: ${winner}`;
+      }, 5200);
+    };
+  </script>
+</body>
+</html>
